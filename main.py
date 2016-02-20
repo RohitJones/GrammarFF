@@ -2,18 +2,48 @@ from collections import OrderedDict
 
 first_dict = OrderedDict()
 follow_dict = OrderedDict()
+grammar = []                                                # store the various rules of the grammar
+Non_Terminals = []                                          # store the non terminals of the grammar
 
-def main():
-    inputfile = open("input2.txt", 'r')
-    grammar = []                                                # store the various rules of the grammar
-    Non_Terminals = []                                          # store the non terminals of the grammar
-    outputfile = open("output.txt", 'w')
+
+def remove_duplicates(passed_dictionary):
+    for each in passed_dictionary:
+        passed_dictionary[each] = set(passed_dictionary[each])
+
+
+def write_dictionary(passed_dictionary, string_to_print, output_file_name):
+    file_ptr = open(output_file_name, 'a')
+    file_ptr.write("\n")
+
+    for each in passed_dictionary:                              # write the dictionary
+        temp = string_to_print + "(" + each + ") = {"           # to an output file
+                                                                # according to the
+        for item in follow_dict[each]:                          # format
+            temp = temp + item + ", "                           # follow(Non-Terminal) = { Terminals }
+        temp = temp.rstrip(', ')                                #
+        temp += "}\n"                                           #
+        file_ptr.write(temp)                                    #
+
+    file_ptr.close()
+
+
+def get_grammar(input_file_name,output_file_name):
+    inputfile = open(input_file_name, 'r')
+    outputfile = open(output_file_name, 'w')
 
     for line in inputfile:                                      # read the input file containing the grammar
         outputfile.write(line)                                  # write the grammer rules to the output file
         grammar.append(line.strip().split("\n"))                # store each line of input into grammar
 
     inputfile.close()
+    outputfile.close()
+
+
+def main():
+
+    input_file_name = "input2.txt"
+    output_file_name = "output.txt"
+    get_grammar(input_file_name, output_file_name)
 
 #--------------------------------------------calculation of first-------------------------------------------------------
 
@@ -37,8 +67,7 @@ def main():
         if rule[0][3].isupper():                                # check to see if first character after '->' is a non-terminal if
             first_dict[rule[0][0]] += first_dict[rule[0][3]]    # yes, add the first of the non terminal to first list
 
-    for each in first_dict:                                     # read every non terminal of grammar in rule
-        first_dict[each] = set(first_dict[each])                # remove duplicate occurrences of the terminals in the first
+    remove_duplicates(first_dict)
 
 #---------------------------------------------calculation of follow-----------------------------------------------------
 
@@ -54,30 +83,9 @@ def main():
                     else:
                         follow_dict[temp[i]] += temp[i+1]       # the char after temp[i] is a terminal and is added to its follow
 
-    for each in follow_dict:                                    # remove duplicate entries in the first list
-        follow_dict[each] = set(follow_dict[each])
+    remove_duplicates(follow_dict)
 
-    outputfile.write("\n\n")                                    # output formatting
+    write_dictionary(first_dict, "first", output_file_name)
+    write_dictionary(follow_dict, "follow", output_file_name)
 
-    for each in first_dict:                                     # write the dictionary
-        temp = "first(" + each + ") = {"                        # to an output file
-                                                                # according to the
-        for item in first_dict[each]:                           # format
-            temp = temp + item + ", "                           # first(Non-Terminal) = { Terminals }
-        temp = temp.rstrip(', ')                                #
-        temp += "}\n"                                           #
-        outputfile.write(temp)                                  #
-
-    outputfile.write("\n")                                      # output formatting
-
-    for each in follow_dict:                                    # write the dictionary
-        temp = "follow(" + each + ") = {"                       # to an output file
-                                                                # according to the
-        for item in follow_dict[each]:                          # format
-            temp = temp + item + ", "                           # follow(Non-Terminal) = { Terminals }
-        temp = temp.rstrip(', ')                                #
-        temp += "}\n"                                           #
-        outputfile.write(temp)                                  #
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
