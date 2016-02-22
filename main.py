@@ -12,19 +12,17 @@ def remove_duplicates(passed_dictionary):
 
 
 def write_dictionary(passed_dictionary, string_to_print, output_file_name):
-    file_ptr = open(output_file_name, 'a')
-    file_ptr.write("\n")
+    with open(output_file_name, "a") as file_ptr:
+        file_ptr.write("\n")
 
-    for each in passed_dictionary:                              # write the dictionary
-        temp = string_to_print + "(" + each + ") = {"           # to an output file
-                                                                # according to the
-        for item in follow_dict[each]:                          # format
-            temp = temp + item + ", "                           # follow(Non-Terminal) = { Terminals }
-        temp = temp.rstrip(', ')                                #
-        temp += "}\n"                                           #
-        file_ptr.write(temp)                                    #
-
-    file_ptr.close()
+        for each in passed_dictionary:                              # write the dictionary
+            temp = string_to_print + "(" + each + ") = {"           # to an output file
+                                                                    # according to the
+            for item in passed_dictionary[each]:                          # format
+                temp = temp + item + ", "                           # follow(Non-Terminal) = { Terminals }
+            temp = temp.rstrip(', ')                                #
+            temp += "}\n"                                           #
+            file_ptr.write(temp)                                    #
 
 
 def get_grammar(input_file_name,output_file_name):
@@ -87,5 +85,8 @@ def main():
 
     write_dictionary(first_dict, "first", output_file_name)
     write_dictionary(follow_dict, "follow", output_file_name)
+
+    print(first_dict)
+    print(follow_dict)
 
 if __name__ == "__main__": main()
